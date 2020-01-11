@@ -11,7 +11,7 @@ from tqdm import tqdm
 class Agent:
     def __init__(self):
         self.env = gym.make("MountainCar-v0")
-
+        self.env._max_episode_steps = 300
         self.max_epochs = 200
         self.alpha = 0.1
         self.gamma = 1.0
@@ -37,10 +37,10 @@ class Agent:
     def Q(self, state, action):
         return state.dot(self.w[action])
 
-    def policy(self, state):
-        A = np.ones(self.n_actions, dtype=float) * self.epsilon / self.n_actions
+    def policy(self, state, epsilon=0):
+        A = np.ones(self.n_actions, dtype=float) * epsilon / self.n_actions
         a = np.argmax([self.Q(state, a) for a in range(self.n_actions)])
-        A[a] += (1.0 - self.epsilon)
+        A[a] += (1.0 - epsilon)
         return np.random.choice(self.n_actions, p=A)
 
     def train(self, max_epochs=None, alpha=None, gamma=None, epsilon=None, verbose=10):
@@ -56,9 +56,8 @@ class Agent:
         for e in tqdm(range(self.max_epochs)):
             state = self.env.reset()
             state = self.featurize_state(state)
-            c = 0
             while True:
-                action = self.policy(state)
+                action = self.policy(state, self.epsilon)
 
                 next_state, reward, done, _ = self.env.step(action)
                 next_state = self.featurize_state(next_state)
@@ -67,13 +66,8 @@ class Agent:
                 current_q = self.Q(state, action)
                 next_q = self.Q(next_state, next_action)
 
-                t = reward + self.gamma * next_q
-                err = current_q - t
-                dw = err.dot(state)
+                self.w[action] += self.alpha * (reward + self.gamma * next_q - current_q).dot(state)
 
-                self.w[action] -= self.alpha * dw
-
-                c += 1
                 state = next_state
                 if done:
                     break
@@ -85,8 +79,8 @@ class Agent:
 
         print("Training completed.")
         plt.errorbar(scatter_x, scatter_y, scatter_s, linestyle='None', marker='^')
-        plt.show()
         plt.savefig('result.png')
+        plt.show()
 
     def evaluate(self):
         epochs = 25
