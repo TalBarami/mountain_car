@@ -14,6 +14,7 @@ class SAgent(Agent):
         self.alpha = 0.1
         self.gamma = 1.0
         self.epsilon = 0.1
+        self.result_path = 'result_S.png'
 
         gammas = [0.5, 1.0, 2.0, 3.5, 5.0]
         self.n_actions = self.env.action_space.n
@@ -49,5 +50,4 @@ class SAgent(Agent):
         next_q = self.Q(next_state, next_action)
 
         self.w[action] += self.alpha * (reward + self.gamma * next_q - current_q).dot(state)
-
         return next_state, done

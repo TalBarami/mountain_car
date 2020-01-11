@@ -8,11 +8,12 @@ from BaseAgent import Agent
 class QAgent(Agent):
     def __init__(self):
         super().__init__()
-        self.env._max_episode_steps = 600
-        self.max_epochs = 800
+        self.env._max_episode_steps = 1000
+        self.max_epochs = 1000
         self.alpha = 0.2
         self.gamma = 1.0
         self.epsilon = 0.2
+        self.result_path = 'result_Q.png'
 
         self.state_space = ((self.env.high - self.env.low) * np.array([10, 100])).astype(int) + 1
         self.q_table = np.random.uniform(low=-1, high=1,

@@ -63,7 +63,7 @@ class Agent(object):
         plt.show()
 
     def evaluate(self):
-        epochs = 100
+        epochs = 20
         r = np.zeros(epochs)
         for e in range(epochs):
             state = self.env.reset()
@@ -82,17 +82,23 @@ class Agent(object):
         return r.mean(), r.std()
 
     def simulate(self, state=None):
-        state = state or self.env.reset()
+        env = self.env.env
+        state = state or env.reset()
         state = self.featurize(state)
 
+        c = 0
         while True:
-            self.env.render()
+            env.render()
             action = self.policy(state)
-            next_state, reward, done, _ = self.env.step(action)
+            next_state, reward, done, _ = env.step(action)
             state = self.featurize(next_state)
 
+            c += 1
             if done:
-                break
+                return True
+            if c > 800:
+                print('Simulation failed!')
+                return False
 
     def shutdown(self):
         self.env.close()
