@@ -13,7 +13,7 @@ class QAgent(Agent):
         self.alpha = 0.2
         self.gamma = 1.0
         self.epsilon = 0.8
-        self.result_path = 'result_Q.png'
+        self.result_name = 'Q.png'
 
         self.state_space = ((self.env.high - self.env.low) * np.array([10, 100])).astype(int) + 1
         self.q_table = np.random.uniform(low=-1, high=1,

@@ -2,6 +2,7 @@ import numpy as np
 import gym
 import abc
 from tqdm import tqdm
+from os.path import join
 import matplotlib.pyplot as plt
 
 
@@ -9,13 +10,14 @@ class Agent(object):
     __metaclass__ = abc.ABCMeta
 
     def __init__(self):
+        self.result_folder = 'results'
         self.env = gym.make("MountainCar-v0")
-        self.env._max_episode_steps = 0
-        self.max_epochs = 0
-        self.alpha = 0
-        self.gamma = 0
-        self.epsilon = 0
-        self.result_path = 'result.png'
+        self.env._max_episode_steps = None
+        self.max_epochs = None
+        self.alpha = None
+        self.gamma = None
+        self.epsilon = None
+        self.result_name = None
 
     @abc.abstractmethod
     def featurize(self, state):
@@ -59,7 +61,7 @@ class Agent(object):
 
         print("Training completed.")
         plt.errorbar(scatter_x, scatter_y, scatter_s, linestyle='None', marker='^')
-        plt.savefig(self.result_path)
+        plt.savefig(join(self.result_folder, self.result_name))
         plt.show()
 
     def evaluate(self):
@@ -81,14 +83,15 @@ class Agent(object):
 
         return r.mean(), r.std()
 
-    def simulate(self, state=None):
+    def simulate(self, state=None, render=False):
         env = self.env.env
         state = state or env.reset()
         state = self.featurize(state)
 
         c = 0
         while True:
-            env.render()
+            if render:
+                env.render()
             action = self.policy(state)
             next_state, reward, done, _ = env.step(action)
             state = self.featurize(next_state)

@@ -10,11 +10,11 @@ class SAgent(Agent):
     def __init__(self):
         super().__init__()
         self.env._max_episode_steps = 300
-        self.max_epochs = 200
+        self.max_epochs = 1000
         self.alpha = 0.1
         self.gamma = 1.0
-        self.epsilon = 0.1
-        self.result_path = 'result_S.png'
+        self.epsilon = 0.8
+        self.result_name = 'S.png'
 
         gammas = [0.5, 1.0, 2.0, 3.5, 5.0]
         self.n_actions = self.env.action_space.n
@@ -50,4 +50,5 @@ class SAgent(Agent):
         next_q = self.Q(next_state, next_action)
 
         self.w[action] += self.alpha * (reward + self.gamma * next_q - current_q).dot(state)
+        self.epsilon -= self.epsilon / self.max_epochs
         return next_state, done

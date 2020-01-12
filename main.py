@@ -2,14 +2,15 @@ from QAgent import QAgent
 from SAgent import SAgent
 
 if __name__ == "__main__":
-    agents = [('QAgent', QAgent()), ('SAgent', SAgent())]
+    # agents = [('QAgent', QAgent()), ('SAgent', SAgent())]
+    agents = [('SAgent', SAgent())]
     result = {n: [] for n, a in agents}
 
     for name, agent in agents:
         agent.train()
         for i in range(100):
             print(f'Simulation {i} for: {name}')
-            result[name].append(agent.simulate())
+            result[name].append(agent.simulate(render=False))
         agent.shutdown()
 
     for k, v in result.items():
