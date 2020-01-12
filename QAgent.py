@@ -8,11 +8,11 @@ from BaseAgent import Agent
 class QAgent(Agent):
     def __init__(self):
         super().__init__()
-        self.env._max_episode_steps = 1000
-        self.max_epochs = 1000
+        self.env._max_episode_steps = 400
+        self.max_epochs = 5000
         self.alpha = 0.2
         self.gamma = 1.0
-        self.epsilon = 0.2
+        self.epsilon = 0.8
         self.result_path = 'result_Q.png'
 
         self.state_space = ((self.env.high - self.env.low) * np.array([10, 100])).astype(int) + 1
@@ -29,10 +29,14 @@ class QAgent(Agent):
 
     def perform_step(self, state, action):
         next_state, reward, done, _ = self.env.step(action)
-        next_state = self.featurize(next_state)
 
-        current_q = self.q_table[state[0], state[1], action]
-        next_q = np.max(self.q_table[next_state[0], next_state[1]])
+        if done and next_state[0] >= 0.5:
+            self.q_table[state[0], state[1], action] = reward
+        else:
+            next_state = self.featurize(next_state)
+            current_q = self.q_table[state[0], state[1], action]
+            next_q = np.max(self.q_table[next_state[0], next_state[1]])
 
-        self.q_table[state[0], state[1], action] = current_q + self.alpha * (reward + self.gamma * next_q - current_q)
+            self.q_table[state[0], state[1], action] = current_q + self.alpha * (reward + self.gamma * next_q - current_q)
+        self.epsilon -= self.epsilon / self.max_epochs
         return next_state, done
