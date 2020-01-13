@@ -2,10 +2,10 @@ import random
 
 import numpy as np
 
-from BaseAgent import Agent
+from BaseAgent import BaseAgent
 
 
-class QAgent(Agent):
+class QAgent(BaseAgent):
     def __init__(self):
         super().__init__()
         self.env._max_episode_steps = 400
@@ -37,6 +37,6 @@ class QAgent(Agent):
             current_q = self.q_table[state[0], state[1], action]
             next_q = np.max(self.q_table[next_state[0], next_state[1]])
 
-            self.q_table[state[0], state[1], action] = current_q + self.alpha * (reward + self.gamma * next_q - current_q)
+            self.q_table[state[0], state[1], action] += self.alpha * (reward + self.gamma * next_q - current_q)
         self.epsilon -= self.epsilon / self.max_epochs
         return next_state, done

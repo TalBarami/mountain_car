@@ -3,10 +3,10 @@ from sklearn.kernel_approximation import RBFSampler
 from sklearn.pipeline import FeatureUnion
 from sklearn.preprocessing import StandardScaler
 
-from BaseAgent import Agent
+from BaseAgent import BaseAgent
 
 
-class SAgent(Agent):
+class SAgent(BaseAgent):
     def __init__(self):
         super().__init__()
         self.env._max_episode_steps = 300
@@ -28,7 +28,7 @@ class SAgent(Agent):
         self.featurizer = FeatureUnion(features)
         self.featurizer.fit(self.scaler.transform(samples))
 
-        self.w = np.zeros((self.env.action_space.n, self.n_components * len(features)))
+        self.w = np.zeros((self.n_actions, self.n_components * len(features)))
 
     def featurize(self, state):
         return self.featurizer.transform(self.scaler.transform([state]))
@@ -48,7 +48,6 @@ class SAgent(Agent):
         next_action = self.policy(next_state)
         current_q = self.Q(state, action)
         next_q = self.Q(next_state, next_action)
-
         self.w[action] += self.alpha * (reward + self.gamma * next_q - current_q).dot(state)
         self.epsilon -= self.epsilon / self.max_epochs
         return next_state, done

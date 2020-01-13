@@ -6,7 +6,7 @@ from os.path import join
 import matplotlib.pyplot as plt
 
 
-class Agent(object):
+class BaseAgent(object):
     __metaclass__ = abc.ABCMeta
 
     def __init__(self):
