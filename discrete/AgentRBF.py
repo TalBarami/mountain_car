@@ -6,15 +6,15 @@ from sklearn.preprocessing import StandardScaler
 from BaseAgent import BaseAgent
 
 
-class SAgent(BaseAgent):
+class AgentRBF(BaseAgent):
     def __init__(self):
-        super().__init__()
+        super().__init__("MountainCar-v0")
+        self.name = "AgentRBF"
         self.env._max_episode_steps = 300
         self.max_epochs = 1000
         self.alpha = 0.1
         self.gamma = 1.0
         self.epsilon = 0.8
-        self.result_name = 'S.png'
 
         gammas = [0.5, 1.0, 2.0, 3.5, 5.0]
         self.n_actions = self.env.action_space.n

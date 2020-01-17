@@ -5,15 +5,15 @@ import numpy as np
 from BaseAgent import BaseAgent
 
 
-class SAgent2(BaseAgent):
+class AgentDiscretize(BaseAgent):
     def __init__(self):
-        super().__init__()
+        super().__init__("MountainCar-v0")
+        self.name = "AgentDiscretize"
         self.env._max_episode_steps = 400
         self.max_epochs = 5000
         self.alpha = 0.2
         self.gamma = 1.0
         self.epsilon = 0.8
-        self.result_name = 'Q2.png'
 
         self.n_actions = self.env.action_space.n
         self.state_space = ((self.env.high - self.env.low) * np.array([10, 100])).astype(int) + 1

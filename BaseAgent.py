@@ -9,15 +9,16 @@ import matplotlib.pyplot as plt
 class BaseAgent(object):
     __metaclass__ = abc.ABCMeta
 
-    def __init__(self):
-        self.result_folder = 'results'
-        self.env = gym.make("MountainCar-v0")
+    def __init__(self, env):
+        self.env = gym.make(env)
+        self.result_folder = 'discrete/results'
+        self.name = "BaseAgent"
+
         self.env._max_episode_steps = None
         self.max_epochs = None
         self.alpha = None
         self.gamma = None
         self.epsilon = None
-        self.result_name = None
 
     @abc.abstractmethod
     def featurize(self, state):
@@ -61,7 +62,7 @@ class BaseAgent(object):
 
         print("Training completed.")
         plt.errorbar(scatter_x, scatter_y, scatter_s, linestyle='None', marker='^')
-        plt.savefig(join(self.result_folder, self.result_name))
+        plt.savefig(join(self.result_folder, f'{self.name}.png'))
         plt.show()
 
     def evaluate(self):
