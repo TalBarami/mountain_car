@@ -14,7 +14,7 @@ class BaseAgent(object):
         self.result_folder = 'discrete/results'
         self.name = "BaseAgent"
 
-        self.env._max_episode_steps = None
+        # self.env._max_episode_steps = None
         self.max_epochs = None
         self.alpha = None
         self.gamma = None
@@ -42,7 +42,7 @@ class BaseAgent(object):
         scatter_x = []
         scatter_y = []
         scatter_s = []
-
+        self.env.seed(0)
         for e in tqdm(range(self.max_epochs)):
             state = self.env.reset()
             state = self.featurize(state)
@@ -53,7 +53,7 @@ class BaseAgent(object):
 
                 if done:
                     break
-
+            self.epsilon -= self.epsilon / self.max_epochs
             if e % verbose == 0:
                 y, s = self.evaluate()
                 scatter_x.append(e)
@@ -76,7 +76,6 @@ class BaseAgent(object):
                 action = self.policy(state)
                 next_state, reward, done, _ = self.env.step(action)
                 state = self.featurize(next_state)
-
                 c += 1
                 if done:
                     r[e] = c

@@ -49,5 +49,4 @@ class AgentRBF(BaseAgent):
         current_q = self.Q(state, action)
         next_q = self.Q(next_state, next_action)
         self.w[action] += self.alpha * (reward + self.gamma * next_q - current_q).dot(state)
-        self.epsilon -= self.epsilon / self.max_epochs
         return next_state, done

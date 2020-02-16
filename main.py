@@ -4,7 +4,7 @@ from discrete.AgentDiscretize import AgentDiscretize
 from discrete.AgentRBF import AgentRBF
 
 if __name__ == "__main__":
-    agents = [AgentQTable(), AgentDiscretize(), AgentRBF(), AgentQTableContinuous()]
+    agents = [AgentQTableContinuous()]
 
     result = {a.name: [] for a in agents}
 

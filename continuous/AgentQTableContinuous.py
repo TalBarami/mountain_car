@@ -1,6 +1,10 @@
-import random
+from os.path import join
+from tqdm import tqdm
 
+import gym
+import matplotlib.pyplot as plt
 import numpy as np
+import random
 
 from BaseAgent import BaseAgent
 
@@ -9,48 +13,43 @@ class AgentQTableContinuous(BaseAgent):
     def __init__(self):
         super().__init__("MountainCarContinuous-v0")
         self.name = "AgentQTableContinuous"
-        self.env._max_episode_steps = 800
-        self.max_epochs = 15000
-        self.alpha = 0.2
-        self.gamma = 1.0
-        self.epsilon = 0.8
+
+        self.max_epochs = 600
+        self.alpha = 0.5
+        self.gamma = 0.7
+        self.epsilon = 0.1
 
         self.state_space = ((self.env.observation_space.high - self.env.observation_space.low) * np.array([10, 100])).astype(int) + 1
-        self.action_space = ((self.env.action_space.high - self.env.action_space.low) * np.array([10])).astype(int) + 1
-        self.q_table = np.random.uniform(low=-1, high=1,
-                                         size=(self.state_space[0], self.state_space[1],
-                                               self.action_space[0]))
+        self.actions = [np.round(x, 2) for x in np.arange(self.env.action_space.low, self.env.action_space.high + 0.1, 0.1)]
 
-    def featurize(self, state):
-        state = (state - self.env.observation_space.low) * np.array([10, 100])
-        return np.round(state, 0).astype(int)
+        self.q_table = np.zeros([self.state_space[0] * self.state_space[1], len(self.actions)])
+
+    def featurize(self, observation):
+        state = np.floor((observation - self.env.observation_space.low) * np.array([10, 100])).astype(int)
+        return self.state_space[1] * state[0] + state[1]
+
+    def featurize_action(self, action):
+        return int(np.round((action[0] - self.env.action_space.low[0]) * 10, 2))
 
     def policy(self, state, epsilon=0):
         if random.uniform(0, 1) < epsilon:
-            return self.env.action_space.sample()
+            return np.round(self.env.action_space.sample(), 2)
         else:
-            return self.index_to_action(np.argmax(self.q_table[state[0], state[1]]))
-
-    def Q(self, state, action):
-        return self.q_table[state[0], state[1], self.action_to_index(action)]
-
-    def action_to_index(self, action):
-        int((action - self.env.action_space.low) * 10)
-
-    def index_to_action(self, index):
-        return index/10 + self.env.action_space.low
+            return [self.actions[int(np.argmax(self.q_table[state]))]]
 
     def perform_step(self, state, action):
         next_state, reward, done, _ = self.env.step(action)
-
         if done and next_state[0] >= 0.5:
             self.q_table[state[0], state[1], action] = reward
         else:
-            next_state = self.featurize(next_state)
-            next_action = self.policy(next_state)
-            current_q = self.Q(state, action)
-            next_q = self.Q(next_state, next_action)
+            action = self.featurize_action(action)
 
-            self.q_table[state[0], state[1], self.action_to_index(action)] += self.alpha * (reward + self.gamma * next_q - current_q)
-        self.epsilon -= self.epsilon / self.max_epochs
+            reward += 100 * self.gamma * np.abs(next_state[1])
+            next_state = self.featurize(next_state)
+
+            self.q_table[state, action] = (1 - self.alpha) * self.q_table[state, action] + \
+                                          self.alpha * (reward + self.gamma * np.max(self.q_table[next_state]) - self.q_table[state, action])
         return next_state, done
+
+    def shutdown(self):
+        self.env.close()

@@ -38,5 +38,4 @@ class AgentQTable(BaseAgent):
             next_q = np.max(self.q_table[next_state[0], next_state[1]])
 
             self.q_table[state[0], state[1], action] += self.alpha * (reward + self.gamma * next_q - current_q)
-        self.epsilon -= self.epsilon / self.max_epochs
         return next_state, done
