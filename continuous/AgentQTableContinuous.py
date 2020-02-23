@@ -17,7 +17,8 @@ class AgentQTableContinuous(BaseAgent):
         self.max_epochs = 600
         self.alpha = 0.5
         self.gamma = 0.7
-        self.epsilon = 0.1
+        self.epsilon = 0.5
+        self.c = 100
 
         self.state_space = ((self.env.observation_space.high - self.env.observation_space.low) * np.array([10, 100])).astype(int) + 1
         self.actions = [np.round(x, 2) for x in np.arange(self.env.action_space.low, self.env.action_space.high + 0.1, 0.1)]
@@ -44,7 +45,7 @@ class AgentQTableContinuous(BaseAgent):
         else:
             action = self.featurize_action(action)
 
-            reward += 100 * self.gamma * np.abs(next_state[1])
+            reward += self.c * np.abs(next_state[1])
             next_state = self.featurize(next_state)
 
             self.q_table[state, action] = (1 - self.alpha) * self.q_table[state, action] + \
