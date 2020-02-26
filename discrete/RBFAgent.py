@@ -3,13 +3,13 @@ from sklearn.kernel_approximation import RBFSampler
 from sklearn.pipeline import FeatureUnion
 from sklearn.preprocessing import StandardScaler
 
-from BaseAgent import BaseAgent
+from discrete.BaseAgent import BaseAgent
 
 
-class AgentRBF(BaseAgent):
+class RBFAgent(BaseAgent):
     def __init__(self):
         super().__init__("MountainCar-v0")
-        self.name = "AgentRBF"
+        self.name = "RBFAgent"
         self.env._max_episode_steps = 300
         self.max_epochs = 1000
         self.alpha = 0.1

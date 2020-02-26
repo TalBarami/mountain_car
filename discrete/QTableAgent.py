@@ -2,13 +2,13 @@ import random
 
 import numpy as np
 
-from BaseAgent import BaseAgent
+from discrete.BaseAgent import BaseAgent
 
 
-class AgentQTable(BaseAgent):
+class QTableAgent(BaseAgent):
     def __init__(self):
         super().__init__("MountainCar-v0")
-        self.name = "AgentQTable"
+        self.name = "QTableAgent"
         self.env._max_episode_steps = 400
         self.max_epochs = 5000
         self.alpha = 0.2

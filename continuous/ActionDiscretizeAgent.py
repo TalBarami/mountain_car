@@ -1,18 +1,13 @@
-from os.path import join
-from tqdm import tqdm
-
-import gym
-import matplotlib.pyplot as plt
 import numpy as np
 import random
 
-from BaseAgent import BaseAgent
+from discrete.BaseAgent import BaseAgent
 
 
-class AgentQTableContinuous(BaseAgent):
+class ActionDiscretizeAgent(BaseAgent):
     def __init__(self):
         super().__init__("MountainCarContinuous-v0")
-        self.name = "AgentQTableContinuous"
+        self.name = "ActionDiscretizeAgent"
 
         self.max_epochs = 600
         self.alpha = 0.5

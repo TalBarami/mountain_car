@@ -2,13 +2,13 @@ import random
 
 import numpy as np
 
-from BaseAgent import BaseAgent
+from discrete.BaseAgent import BaseAgent
 
 
-class AgentDiscretize(BaseAgent):
+class DiscretizeAgent(BaseAgent):
     def __init__(self):
         super().__init__("MountainCar-v0")
-        self.name = "AgentDiscretize"
+        self.name = "DiscretizeAgent"
         self.env._max_episode_steps = 400
         self.max_epochs = 5000
         self.alpha = 0.2

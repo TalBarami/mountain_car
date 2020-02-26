@@ -1,16 +1,17 @@
-from continuous.AgentQTableContinuous import AgentQTableContinuous
-from discrete.AgentQTable import AgentQTable
-from discrete.AgentDiscretize import AgentDiscretize
-from discrete.AgentRBF import AgentRBF
+from continuous.ActorCriticAgent import ActorCriticAgent
+from continuous.ActionDiscretizeAgent import ActionDiscretizeAgent
+from discrete.QTableAgent import QTableAgent
+from discrete.DiscretizeAgent import DiscretizeAgent
+from discrete.RBFAgent import RBFAgent
 
 if __name__ == "__main__":
-    agents = [AgentQTableContinuous()]
+    agents = [ActorCriticAgent()]
 
     result = {a.name: [] for a in agents}
 
     for agent in agents:
         agent.train()
-        for i in range(1000):
+        for i in range(100):
             print(f'Simulation {i} for: {agent.name}')
             result[agent.name].append(agent.simulate(render=False))
         agent.shutdown()
