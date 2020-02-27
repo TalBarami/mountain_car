@@ -7,9 +7,10 @@ import matplotlib.pyplot as plt
 from os.path import join
 from tqdm import tqdm
 
+
 class ActorCriticAgent:
     def __init__(self, actor_lr=0.00001, critic_lr=0.00056, gamma=0.99):
-        self. env = gym.envs.make("MountainCarContinuous-v0")
+        self.env = gym.envs.make("MountainCarContinuous-v0")
         self.name = 'AgentActorCritic'
 
         self.model_path = 'continuous/model/model.ckpt'
@@ -42,7 +43,6 @@ class ActorCriticAgent:
         scaler = sklearn.preprocessing.StandardScaler()
         scaler.fit(state_space_samples)
         return scaler
-
 
     def init_value_function(self):
         layer_size_1 = 400
@@ -126,16 +126,17 @@ class ActorCriticAgent:
                     scatter_y.append(y)
                     scatter_s.append(s)
 
-                if e > 5 and np.mean(rewards) <= 0:
+                if (e > 0) and (e % 5 == 0) and (np.mean(rewards) <= 0):
                     sess.run(tf.global_variables_initializer())
+                    rewards = []
                 elif np.mean(rewards[-100:]) > 90 and len(rewards) >= 101:
                     self.saver.save(sess, self.model_path)
                     break
+
         print("Training completed.")
         plt.errorbar(scatter_x, scatter_y, scatter_s, linestyle='None', marker='^')
         plt.savefig(join(self.result_folder, f'{self.name}.png'))
         plt.show()
-
 
     def evaluate(self, sess):
         epochs = 20
