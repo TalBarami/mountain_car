@@ -9,7 +9,7 @@ from tqdm import tqdm
 
 
 class ActorCriticAgent:
-    def __init__(self, actor_lr=0.00001, critic_lr=0.00056, gamma=0.99):
+    def __init__(self, actor_lr=0.00001, critic_lr=0.0005, gamma=0.99):
         self.env = gym.envs.make("MountainCarContinuous-v0")
         self.name = 'AgentActorCritic'
 
@@ -19,6 +19,7 @@ class ActorCriticAgent:
         self.actor_lr = actor_lr
         self.critic_lr = critic_lr
         self.gamma = gamma
+        self.epsilon = 1e-5
         self.state_placeholder = tf.placeholder(tf.float32, [None, 2])
         self.xavier_initializer = tf.contrib.layers.xavier_initializer()
 
@@ -30,7 +31,7 @@ class ActorCriticAgent:
         self.delta_placeholder = tf.placeholder(tf.float32)
         self.target_placeholder = tf.placeholder(tf.float32)
 
-        self.loss_actor = -tf.log(distribution.prob(self.action_placeholder) + 1e-5) * self.delta_placeholder
+        self.loss_actor = -tf.log(distribution.prob(self.action_placeholder) + self.epsilon) * self.delta_placeholder
         self.training_op_actor = tf.train.AdamOptimizer(self.actor_lr, name='actor_optimizer').minimize(self.loss_actor)
 
         self.loss_critic = tf.reduce_mean(tf.squared_difference(tf.squeeze(self.tf_value_function), self.target_placeholder))
@@ -45,8 +46,8 @@ class ActorCriticAgent:
         return scaler
 
     def init_value_function(self):
-        layer_size_1 = 400
-        layer_size_2 = 400
+        layer_size_1 = 512
+        layer_size_2 = 512
         output_size = 1
 
         with tf.variable_scope("value_function_network"):
@@ -56,8 +57,8 @@ class ActorCriticAgent:
         return tf_value_function
 
     def init_policy(self):
-        layer_size_1 = 40
-        layer_size_2 = 40
+        layer_size_1 = 64
+        layer_size_2 = 64
         output_size = 1
 
         with tf.variable_scope("policy_network"):
@@ -65,7 +66,7 @@ class ActorCriticAgent:
             layer_2 = tf.layers.dense(layer_1, layer_size_2, tf.nn.elu, self.xavier_initializer)
             mu = tf.layers.dense(layer_2, output_size, None, self.xavier_initializer)
             sigma = tf.layers.dense(layer_2, output_size, None, self.xavier_initializer)
-            sigma = tf.nn.softplus(sigma) + 1e-5
+            sigma = tf.nn.softplus(sigma) + self.epsilon
             distribution = tf.contrib.distributions.Normal(mu, sigma)
             tf_policy = tf.squeeze(distribution.sample(1), axis=0)
             tf_policy = tf.clip_by_value(tf_policy, self.env.action_space.low[0], self.env.action_space.high[0])
@@ -126,7 +127,7 @@ class ActorCriticAgent:
                     scatter_y.append(y)
                     scatter_s.append(s)
 
-                if (e > 0) and (e % 5 == 0) and (np.mean(rewards) <= 0):
+                if (e % 5 == 4) and (np.mean(rewards) <= 0):
                     sess.run(tf.global_variables_initializer())
                     rewards = []
                 elif np.mean(rewards[-100:]) > 90 and len(rewards) >= 101:
